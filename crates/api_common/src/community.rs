@@ -1,5 +1,5 @@
 use lemmy_db_schema::{
-  newtypes::{CommunityId, LanguageId, PersonId},
+  newtypes::{CommunityId, CommunityLanguageId, LanguageId, PersonId},
   source::site::Site,
   ListingType,
   SortType,
@@ -72,6 +72,7 @@ pub struct CommunityResponse {
 /// Fetches a list of communities.
 pub struct ListCommunities {
   pub type_: Option<ListingType>,
+  pub language_id: Option<CommunityLanguageId>,
   pub sort: Option<SortType>,
   pub show_nsfw: Option<bool>,
   pub page: Option<i64>,

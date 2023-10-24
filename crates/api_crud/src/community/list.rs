@@ -4,7 +4,7 @@ use lemmy_api_common::{
   context::LemmyContext,
   utils::{check_private_instance, is_admin},
 };
-use lemmy_db_schema::source::local_site::LocalSite;
+use lemmy_db_schema::{newtypes::CommunityLanguageId, source::local_site::LocalSite};
 use lemmy_db_views::structs::LocalUserView;
 use lemmy_db_views_actor::community_view::CommunityQuery;
 use lemmy_utils::error::LemmyError;
@@ -25,12 +25,14 @@ pub async fn list_communities(
 
   let sort = data.sort;
   let listing_type = data.type_;
+  let language_id: Option<CommunityLanguageId> = data.language_id;
   let show_nsfw = data.show_nsfw.unwrap_or_default();
   let page = data.page;
   let limit = data.limit;
   let local_user = local_user_view.map(|l| l.local_user);
   let communities = CommunityQuery {
     listing_type,
+    language_id,
     show_nsfw,
     sort,
     local_user: local_user.as_ref(),

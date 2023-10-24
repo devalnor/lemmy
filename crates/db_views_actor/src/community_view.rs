@@ -11,12 +11,13 @@ use diesel::{
 };
 use diesel_async::RunQueryDsl;
 use lemmy_db_schema::{
-  newtypes::{CommunityId, PersonId},
+  newtypes::{CommunityId, CommunityLanguageId, PersonId},
   schema::{
     community,
     community_aggregates,
     community_block,
     community_follower,
+    community_language,
     instance_block,
     local_user,
   },
@@ -100,6 +101,14 @@ fn queries<'a>() -> Queries<
 
     let mut query = all_joins(community::table.into_boxed(), my_person_id)
       .left_join(local_user::table.on(local_user::person_id.eq(person_id_join)))
+      .left_join(
+        community_language::table.on(
+          community_language::community_id.eq(community::id).and(
+            community_language::language_id
+              .eq(options.language_id.unwrap_or(CommunityLanguageId(-1))),
+          ),
+        ),
+      )
       .select(selection);
 
     if let Some(search_term) = options.search_term {
@@ -145,6 +154,9 @@ fn queries<'a>() -> Queries<
       };
     }
 
+    if let Some(language_id) = options.language_id {
+      query = query.filter(community_language::language_id.eq(language_id));
+    }
     // Don't show blocked communities and communities on blocked instances. nsfw communities are
     // also hidden (based on profile setting)
     if options.local_user.is_some() {
@@ -199,6 +211,7 @@ impl CommunityView {
 #[derive(Default)]
 pub struct CommunityQuery<'a> {
   pub listing_type: Option<ListingType>,
+  pub language_id: Option<CommunityLanguageId>,
   pub sort: Option<SortType>,
   pub local_user: Option<&'a LocalUser>,
   pub search_term: Option<String>,

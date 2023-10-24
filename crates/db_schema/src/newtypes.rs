@@ -128,7 +128,8 @@ pub struct LocalUserLanguageId(pub i32);
 pub struct SiteLanguageId(pub i32);
 
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "full", derive(DieselNewType))]
+#[cfg_attr(feature = "full", derive(DieselNewType, TS))]
+#[cfg_attr(feature = "full", ts(export))]
 pub struct CommunityLanguageId(pub i32);
 
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Serialize, Deserialize, Default)]
